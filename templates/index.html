@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeLens - F1 Code Explainer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- F1 Background Video -->
+    <video autoplay muted loop id="bg-video">
+        <source src="data:video/mp4;base64," type="video/mp4">
+    </video>
+    
+    <!-- Background Image Fallback -->
+    <div class="bg-image"></div>
+    
+    <!-- Animated F1 Track Lines -->
+    <div class="track-lines">
+        <div class="track-line track-line-1"></div>
+        <div class="track-line track-line-2"></div>
+        <div class="track-line track-line-3"></div>
+    </div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-flag-checkered"></i>
+                <h1>CodeLens<span class="f1-subtitle">F1 Code Explainer</span></h1>
+            </div>
+            <div class="race-status">
+                <div class="status-indicator" id="engine-status">
+                    <i class="fas fa-circle"></i>
+                    <span>Engine Ready</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Input Section -->
+            <section class="input-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-code"></i> Race Control Center</h2>
+                    <p>Paste your code below for comprehensive F1-style analysis</p>
+                </div>
+                
+                <div class="code-input-wrapper">
+                    <textarea 
+                        id="code-input" 
+                        placeholder="// Paste your code here for pit crew analysis...
+// Example: Python function, algorithm, or any code snippet
+
+def is_palindrome(text):
+    text = text.lower().replace(' ', '')
+    return text == text[::-1]
+
+result = is_palindrome('A man a plan a canal Panama')
+print(f'Is palindrome: {result}')"
+                        rows="12"
+                    ></textarea>
+                    
+                    <div class="input-controls">
+                        <button id="analyze-btn" class="analyze-btn">
+                            <i class="fas fa-rocket"></i>
+                            <span>Start Race Analysis</span>
+                        </button>
+                        <button id="clear-btn" class="clear-btn">
+                            <i class="fas fa-eraser"></i>
+                            Clear Track
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loading Animation -->
+            <section class="loading-section" id="loading-section" style="display: none;">
+                <div class="speedometer">
+                    <div class="speedometer-inner">
+                        <div class="needle" id="speedometer-needle"></div>
+                        <div class="speed-value" id="speed-value">0</div>
+                        <div class="speed-unit">RPM</div>
+                    </div>
+                </div>
+                <div class="f1-car-animation">
+                    <div class="f1-car">🏎️</div>
+                    <div class="loading-text">Analyzing code at racing speed...</div>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-car" id="progress-car">🏁</div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="results-section" style="display: none;">
+                <div class="section-header">
+                    <h2><i class="fas fa-trophy"></i> Race Analysis Results</h2>
+                    <div class="checkered-flag">🏁</div>
+                </div>
+                
+                <div class="results-content" id="results-content">
+                    <!-- Results will be populated here -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Error Modal -->
+    <div class="error-modal" id="error-modal" style="display: none;">
+        <div class="error-content">
+            <div class="error-icon">🚨</div>
+            <h3>Pit Stop Required!</h3>
+            <p id="error-message"></p>
+            <button class="error-close" onclick="closeError()">Back to Track</button>
+        </div>
+    </div>
+
+    <script>
+        let isAnalyzing = false;
+
+        // DOM Elements
+        const codeInput = document.getElementById('code-input');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const loadingSection = document.getElementById('loading-section');
+        const resultsSection = document.getElementById('results-section');
+        const resultsContent = document.getElementById('results-content');
+        const errorModal = document.getElementById('error-modal');
+        const errorMessage = document.getElementById('error-message');
+        const engineStatus = document.getElementById('engine-status');
+
+        // Event Listeners
+        analyzeBtn.addEventListener('click', analyzeCode);
+        clearBtn.addEventListener('click', clearAll);
+
+        // Keyboard shortcuts
+        codeInput.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                analyzeCode();
+            }
+        });
+
+        async function analyzeCode() {
+            if (isAnalyzing) return;
+            
+            const code = codeInput.value.trim();
+            if (!code) {
+                showError('No code detected on the track! Please paste your code to begin the race analysis.');
+                return;
+            }
+
+            isAnalyzing = true;
+            showLoading();
+            updateEngineStatus('analyzing', 'Race in Progress');
+
+            try {
+                const response = await fetch('/explain', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code: code })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.message);
+                }
+
+                displayResults(data.explanation);
+                updateEngineStatus('success', 'Race Complete');
+
+            } catch (error) {
+                console.error('Analysis error:', error);
+                showError(error.message || 'Unexpected pit stop required! Please try again.');
+                updateEngineStatus('error', 'Technical Issue');
+            } finally {
+                isAnalyzing = false;
+                hideLoading();
+            }
+        }
+
+        function showLoading() {
+            loadingSection.style.display = 'block';
+            resultsSection.style.display = 'none';
+            analyzeBtn.disabled = true;
+            
+            // Animate speedometer
+            animateSpeedometer();
+            
+            // Animate progress car
+            animateProgressCar();
+            
+            // Scroll to loading
+            loadingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function hideLoading() {
+            loadingSection.style.display = 'none';
+            analyzeBtn.disabled = false;
+        }
+
+        function animateSpeedometer() {
+            const needle = document.getElementById('speedometer-needle');
+            const speedValue = document.getElementById('speed-value');
+            let currentSpeed = 0;
+            const maxSpeed = 18000;
+            
+            const speedInterval = setInterval(() => {
+                currentSpeed += Math.random() * 500 + 200;
+                if (currentSpeed > maxSpeed) currentSpeed = maxSpeed;
+                
+                const rotation = (currentSpeed / maxSpeed) * 180 - 90;
+                needle.style.transform = `rotate(${rotation}deg)`;
+                speedValue.textContent = Math.floor(currentSpeed);
+                
+                if (currentSpeed >= maxSpeed) {
+                    clearInterval(speedInterval);
+                }
+            }, 100);
+        }
+
+        function animateProgressCar() {
+            const progressCar = document.getElementById('progress-car');
+            let position = 0;
+            
+            const carInterval = setInterval(() => {
+                position += Math.random() * 3 + 1;
+                if (position > 100) position = 100;
+                
+                progressCar.style.left = `${position}%`;
+                
+                if (position >= 100) {
+                    clearInterval(carInterval);
+                }
+            }, 100);
+        }
+
+        function displayResults(explanation) {
+            resultsContent.innerHTML = generateResultsHTML(explanation);
+            resultsSection.style.display = 'block';
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Add animation classes
+            setTimeout(() => {
+                const resultCards = document.querySelectorAll('.result-card');
+                resultCards.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.classList.add('animate-in');
+                    }, index * 100);
+                });
+            }, 100);
+        }
+
+        function generateResultsHTML(explanation) {
+            return `
+                <!-- Summary Card -->
+                <div class="result-card summary-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-trophy"></i> Race Summary</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="summary-item">
+                            <strong>What it does:</strong> ${explanation.summary.what_it_does}
+                        </div>
+                        <div class="summary-item">
+                            <strong>${explanation.summary.why_useful}</strong>
+                        </div>
+                        <div class="summary-item">
+                            <strong>${explanation.summary.when_to_use}</strong>
+                        </div>
+                        <div class="racing-verdict">
+                            ${explanation.summary.racing_verdict}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Line by Line Analysis -->
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-list-ol"></i> Lap-by-Lap Analysis</h3>
+                    </div>
+                    <div class="card-content">
+                        ${explanation.line_by_line.map(line => `
+                            <div class="line-analysis">
+                                <div class="line-number">Line ${line.line_number}</div>
+                                <div class="line-code"><code>${escapeHtml(line.code)}</code></div>
+                                <div class="line-explanation">${line.explanation}</div>
+                                <div class="racing-metaphor">${line.racing_metaphor}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Keywords and Symbols -->
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-key"></i> Technical Specifications</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="keywords-grid">
+                            ${Object.entries(explanation.keywords_symbols).map(([keyword, definition]) => `
+                                <div class="keyword-item">
+                                    <div class="keyword">${keyword}</div>
+                                    <div class="definition">${definition}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Functions Used -->
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-cogs"></i> Pit Crew Functions</h3>
+                    </div>
+                    <div class="card-content">
+                        ${Object.entries(explanation.functions_used).map(([func, info]) => `
+                            <div class="function-item">
+                                <div class="function-name">${func}()</div>
+                                <div class="function-role"><strong>Role:</strong> ${info.role}</div>
+                                <div class="function-definition">${info.definition}</div>
+                                <div class="function-usage"><strong>Usage:</strong> ${info.usage}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Bugs and Issues -->
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Technical Inspection</h3>
+                    </div>
+                    <div class="card-content">
+                        ${explanation.bugs_issues.map(issue => `
+                            <div class="issue-item ${issue.type.includes('✅') ? 'issue-success' : issue.type.includes('🚨') ? 'issue-error' : 'issue-warning'}">
+                                <div class="issue-type">${issue.type}</div>
+                                <div class="issue-description">${issue.description}</div>
+                                <div class="issue-suggestion">${issue.suggestion}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Complexity Analysis -->
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-tachometer-alt"></i> Performance Telemetry</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="complexity-grid">
+                            <div class="complexity-item">
+                                <div class="complexity-label">Time Complexity</div>
+                                <div class="complexity-value">${explanation.complexity_analysis.time_complexity}</div>
+                            </div>
+                            <div class="complexity-item">
+                                <div class="complexity-label">Space Complexity</div>
+                                <div class="complexity-value">${explanation.complexity_analysis.space_complexity}</div>
+                            </div>
+                        </div>
+                        <div class="code-metrics">
+                            <h4>Code Metrics</h4>
+                            <div class="metrics-grid">
+                                <div class="metric">Total Lines: ${explanation.complexity_analysis.code_metrics.total_lines}</div>
+                                <div class="metric">Code Lines: ${explanation.complexity_analysis.code_metrics.code_lines}</div>
+                                <div class="metric">Comments: ${explanation.complexity_analysis.code_metrics.comment_lines}</div>
+                                <div class="metric">Blank Lines: ${explanation.complexity_analysis.code_metrics.blank_lines}</div>
+                            </div>
+                        </div>
+                        ${explanation.complexity_analysis.complexity_factors.length > 0 ? `
+                            <div class="complexity-factors">
+                                <h4>Performance Factors</h4>
+                                ${explanation.complexity_analysis.complexity_factors.map(factor => `
+                                    <div class="factor">${factor}</div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- Input/Output Analysis -->
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-exchange-alt"></i> Data Flow Analysis</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="io-grid">
+                            <div class="io-section">
+                                <h4><i class="fas fa-sign-in-alt"></i> Inputs</h4>
+                                ${explanation.inputs_outputs.inputs.length > 0 ? 
+                                    explanation.inputs_outputs.inputs.map(input => `<div class="io-item">${input}</div>`).join('') :
+                                    '<div class="io-item">No external inputs detected</div>'
+                                }
+                            </div>
+                            <div class="io-section">
+                                <h4><i class="fas fa-sign-out-alt"></i> Outputs</h4>
+                                ${explanation.inputs_outputs.outputs.length > 0 ? 
+                                    explanation.inputs_outputs.outputs.map(output => `<div class="io-item">${output}</div>`).join('') :
+                                    '<div class="io-item">No outputs detected</div>'
+                                }
+                            </div>
+                        </div>
+                        <div class="data-flow">${explanation.inputs_outputs.data_flow}</div>
+                    </div>
+                </div>
+
+                <!-- Security Analysis -->
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-shield-alt"></i> Safety Regulations</h3>
+                    </div>
+                    <div class="card-content">
+                        ${explanation.security_concerns.map(concern => `
+                            <div class="security-item ${concern.level.includes('✅') ? 'security-safe' : concern.level.includes('🚨') ? 'security-high' : 'security-medium'}">
+                                <div class="security-level">${concern.level}</div>
+                                <div class="security-issue"><strong>${concern.issue}</strong></div>
+                                <div class="security-description">${concern.description}</div>
+                                <div class="security-recommendation">${concern.recommendation}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Pseudocode -->
+                <div class="result-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-map"></i> Race Strategy</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="pseudocode">
+                            ${explanation.pseudocode.map(line => `
+                                <div class="pseudo-line">${line}</div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function clearAll() {
+            codeInput.value = '';
+            resultsSection.style.display = 'none';
+            updateEngineStatus('ready', 'Engine Ready');
+            codeInput.focus();
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorModal.style.display = 'flex';
+        }
+
+        function closeError() {
+            errorModal.style.display = 'none';
+        }
+
+        function updateEngineStatus(status, text) {
+            const statusClasses = {
+                ready: 'status-ready',
+                analyzing: 'status-analyzing', 
+                success: 'status-success',
+                error: 'status-error'
+            };
+            
+            engineStatus.className = 'status-indicator ' + statusClasses[status];
+            engineStatus.querySelector('span').textContent = text;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        updateEngineStatus('ready', 'Engine Ready');
+        codeInput.focus();
+    </script>
+</body>
+</html>

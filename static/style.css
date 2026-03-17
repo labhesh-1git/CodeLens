@@ -1,0 +1,1286 @@
+/* F1 Racing Theme CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* F1 Racing Colors */
+    --f1-red: #dc143c;
+    --f1-dark-red: #b71c1c;
+    --f1-black: #0a0a0a;
+    --f1-white: #ffffff;
+    --f1-gray: #333333;
+    --f1-silver: #c0c0c0;
+    --f1-gold: #ffd700;
+    
+    /* Gradients */
+    --racing-gradient: linear-gradient(135deg, var(--f1-red) 0%, var(--f1-dark-red) 100%);
+    --track-gradient: linear-gradient(90deg, var(--f1-black) 0%, var(--f1-gray) 50%, var(--f1-black) 100%);
+    --speed-gradient: linear-gradient(45deg, var(--f1-red), var(--f1-gold), var(--f1-red));
+    
+    /* Typography */
+    --font-primary: 'Orbitron', monospace;
+    --font-secondary: 'Rajdhani', sans-serif;
+    
+    /* Animations */
+    --race-speed: 0.8s;
+    --pit-speed: 0.3s;
+}
+
+body {
+    font-family: var(--font-secondary);
+    background: var(--f1-black);
+    color: var(--f1-white);
+    line-height: 1.6;
+    overflow-x: hidden;
+    position: relative;
+    min-height: 100vh;
+}
+
+/* Background Elements */
+#bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -3;
+    opacity: 0.1;
+}
+
+.bg-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(220, 20, 60, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(220, 20, 60, 0.1) 0%, transparent 50%),
+        linear-gradient(45deg, var(--f1-black) 0%, #111 50%, var(--f1-black) 100%);
+    z-index: -2;
+}
+
+.track-lines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.track-line {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--f1-red) 50%, transparent 100%);
+    animation: race-line 4s linear infinite;
+}
+
+.track-line-1 {
+    top: 20%;
+    animation-delay: 0s;
+}
+
+.track-line-2 {
+    top: 50%;
+    animation-delay: 1.3s;
+}
+
+.track-line-3 {
+    top: 80%;
+    animation-delay: 2.6s;
+}
+
+@keyframes race-line {
+    0% {
+        left: -100%;
+        width: 0%;
+    }
+    10% {
+        width: 10%;
+    }
+    50% {
+        width: 30%;
+    }
+    90% {
+        width: 10%;
+    }
+    100% {
+        left: 100%;
+        width: 0%;
+    }
+}
+
+/* Header */
+.header {
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--f1-red);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(220, 20, 60, 0.3);
+}
+
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo i {
+    font-size: 2rem;
+    color: var(--f1-red);
+    animation: flag-wave 2s ease-in-out infinite;
+}
+
+@keyframes flag-wave {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+.logo h1 {
+    font-family: var(--font-primary);
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--f1-white);
+    text-shadow: 2px 2px 4px rgba(220, 20, 60, 0.5);
+}
+
+.f1-subtitle {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--f1-red);
+    margin-top: -0.5rem;
+}
+
+.race-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    transition: all var(--pit-speed);
+}
+
+.status-indicator i {
+    font-size: 0.8rem;
+}
+
+.status-ready {
+    background: rgba(0, 255, 0, 0.1);
+    color: #00ff00;
+    border: 1px solid #00ff00;
+}
+
+.status-ready i {
+    color: #00ff00;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.status-analyzing {
+    background: rgba(255, 165, 0, 0.1);
+    color: #ffa500;
+    border: 1px solid #ffa500;
+}
+
+.status-analyzing i {
+    color: #ffa500;
+    animation: spin 1s linear infinite;
+}
+
+.status-success {
+    background: rgba(0, 255, 0, 0.1);
+    color: #00ff00;
+    border: 1px solid #00ff00;
+}
+
+.status-error {
+    background: rgba(255, 0, 0, 0.1);
+    color: #ff4444;
+    border: 1px solid #ff4444;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Main Content */
+.main-content {
+    padding: 2rem 0;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Section Headers */
+.section-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.section-header h2 {
+    font-family: var(--font-primary);
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: var(--speed-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 20px rgba(220, 20, 60, 0.5);
+}
+
+.section-header p {
+    font-size: 1.2rem;
+    color: var(--f1-silver);
+    font-weight: 300;
+}
+
+/* Input Section */
+.input-section {
+    margin-bottom: 3rem;
+}
+
+.code-input-wrapper {
+    background: rgba(51, 51, 51, 0.95);
+    border-radius: 15px;
+    padding: 2rem;
+    border: 2px solid var(--f1-red);
+    box-shadow: 
+        0 10px 40px rgba(220, 20, 60, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.code-input-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: var(--speed-gradient);
+    animation: racing-border 3s linear infinite;
+}
+
+@keyframes racing-border {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+#code-input {
+    width: 100%;
+    min-height: 300px;
+    background: rgba(10, 10, 10, 0.8);
+    border: 1px solid var(--f1-gray);
+    border-radius: 10px;
+    padding: 1.5rem;
+    color: var(--f1-white);
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+    transition: all var(--pit-speed);
+}
+
+#code-input:focus {
+    border-color: var(--f1-red);
+    box-shadow: 
+        0 0 0 3px rgba(220, 20, 60, 0.3),
+        inset 0 0 20px rgba(220, 20, 60, 0.1);
+}
+
+#code-input::placeholder {
+    color: var(--f1-silver);
+    opacity: 0.7;
+}
+
+.input-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.analyze-btn, .clear-btn {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 30px;
+    font-family: var(--font-secondary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--pit-speed);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.analyze-btn {
+    background: var(--racing-gradient);
+    color: var(--f1-white);
+    box-shadow: 
+        0 4px 15px rgba(220, 20, 60, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.analyze-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 8px 25px rgba(220, 20, 60, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.analyze-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.clear-btn {
+    background: rgba(51, 51, 51, 0.8);
+    color: var(--f1-silver);
+    border: 2px solid var(--f1-gray);
+}
+
+.clear-btn:hover {
+    background: rgba(51, 51, 51, 1);
+    border-color: var(--f1-silver);
+    color: var(--f1-white);
+    transform: translateY(-2px);
+}
+
+/* Loading Section */
+.loading-section {
+    text-align: center;
+    padding: 3rem 0;
+    margin: 2rem 0;
+}
+
+.speedometer {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 2rem;
+    position: relative;
+    background: radial-gradient(circle, var(--f1-black) 30%, var(--f1-gray) 70%, var(--f1-red) 100%);
+    border-radius: 50%;
+    border: 4px solid var(--f1-red);
+    box-shadow: 
+        0 0 50px rgba(220, 20, 60, 0.5),
+        inset 0 0 50px rgba(0, 0, 0, 0.5);
+}
+
+.speedometer-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    background: var(--f1-black);
+    border-radius: 50%;
+    border: 2px solid var(--f1-gray);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.needle {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform-origin: bottom center;
+    width: 3px;
+    height: 70px;
+    background: var(--racing-gradient);
+    border-radius: 2px;
+    transform: translateX(-50%) rotate(-90deg);
+    transition: transform 0.3s ease-out;
+    box-shadow: 0 0 10px var(--f1-red);
+}
+
+.speed-value {
+    font-family: var(--font-primary);
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--f1-red);
+    text-shadow: 0 0 10px var(--f1-red);
+}
+
+.speed-unit {
+    font-size: 0.8rem;
+    color: var(--f1-silver);
+    margin-top: -0.5rem;
+}
+
+.f1-car-animation {
+    margin: 2rem 0;
+}
+
+.f1-car {
+    font-size: 3rem;
+    display: inline-block;
+    animation: car-race 2s ease-in-out infinite;
+}
+
+@keyframes car-race {
+    0%, 100% { transform: translateX(-20px) rotate(-5deg); }
+    50% { transform: translateX(20px) rotate(5deg); }
+}
+
+.loading-text {
+    font-family: var(--font-secondary);
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--f1-red);
+    margin-top: 1rem;
+    animation: text-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes text-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.progress-track {
+    width: 100%;
+    height: 4px;
+    background: var(--f1-gray);
+    border-radius: 2px;
+    margin: 2rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-car {
+    position: absolute;
+    left: 0;
+    top: -8px;
+    font-size: 1.5rem;
+    transition: left 0.2s ease-out;
+}
+
+/* Results Section */
+.results-section {
+    margin-top: 3rem;
+}
+
+.checkered-flag {
+    font-size: 3rem;
+    animation: flag-celebrate 2s ease-in-out infinite;
+}
+
+@keyframes flag-celebrate {
+    0%, 100% { transform: rotate(-10deg) scale(1); }
+    50% { transform: rotate(10deg) scale(1.1); }
+}
+
+.results-content {
+    display: grid;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.result-card {
+    background: rgba(51, 51, 51, 0.95);
+    border-radius: 15px;
+    border: 2px solid var(--f1-red);
+    overflow: hidden;
+    position: relative;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all var(--race-speed);
+    backdrop-filter: blur(10px);
+    box-shadow: 
+        0 10px 40px rgba(220, 20, 60, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.result-card.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.result-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+        0 15px 50px rgba(220, 20, 60, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.card-header {
+    background: var(--racing-gradient);
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid var(--f1-dark-red);
+}
+
+.card-header h3 {
+    font-family: var(--font-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--f1-white);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-content {
+    padding: 2rem;
+}
+
+/* Summary Card Styles */
+.summary-card .card-content {
+    background: linear-gradient(135deg, rgba(220, 20, 60, 0.1) 0%, rgba(0, 0, 0, 0.3) 100%);
+}
+
+.summary-item {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border-left: 4px solid var(--f1-red);
+}
+
+.racing-verdict {
+    background: var(--racing-gradient);
+    color: var(--f1-white);
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Line Analysis Styles */
+.line-analysis {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border-left: 4px solid var(--f1-red);
+    transition: all var(--pit-speed);
+}
+
+.line-analysis:hover {
+    background: rgba(0, 0, 0, 0.5);
+    border-left-color: var(--f1-gold);
+}
+
+.line-number {
+    display: inline-block;
+    background: var(--f1-red);
+    color: var(--f1-white);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.line-code {
+    background: var(--f1-black);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+    border: 1px solid var(--f1-gray);
+    font-family: 'Courier New', monospace;
+    overflow-x: auto;
+}
+
+.line-explanation {
+    color: var(--f1-white);
+    margin: 0.5rem 0;
+    line-height: 1.6;
+}
+
+.racing-metaphor {
+    color: var(--f1-gold);
+    font-style: italic;
+    font-size: 0.9rem;
+    padding: 0.5rem;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 5px;
+    margin-top: 0.5rem;
+}
+
+/* Keywords Grid */
+.keywords-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.keyword-item {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border: 1px solid var(--f1-gray);
+    transition: all var(--pit-speed);
+}
+
+.keyword-item:hover {
+    border-color: var(--f1-red);
+    background: rgba(220, 20, 60, 0.1);
+}
+
+.keyword {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: var(--f1-red);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.definition {
+    color: var(--f1-silver);
+    line-height: 1.5;
+}
+
+/* Function Items */
+.function-item {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border-left: 4px solid var(--f1-gold);
+}
+
+.function-name {
+    font-family: 'Courier New', monospace;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--f1-gold);
+    margin-bottom: 1rem;
+}
+
+.function-role, .function-definition, .function-usage {
+    margin-bottom: 0.8rem;
+    line-height: 1.5;
+}
+
+.function-role strong, .function-definition strong, .function-usage strong {
+    color: var(--f1-red);
+}
+
+/* Issue Items */
+.issue-item {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 10px;
+    border-left: 4px solid;
+}
+
+.issue-success {
+    background: rgba(0, 255, 0, 0.1);
+    border-left-color: #00ff00;
+}
+
+.issue-warning {
+    background: rgba(255, 165, 0, 0.1);
+    border-left-color: #ffa500;
+}
+
+.issue-error {
+    background: rgba(255, 0, 0, 0.1);
+    border-left-color: #ff4444;
+}
+
+.issue-type {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.issue-description, .issue-suggestion {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+/* Complexity Analysis */
+.complexity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.complexity-item {
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border: 2px solid var(--f1-red);
+    text-align: center;
+}
+
+.complexity-label {
+    font-weight: bold;
+    color: var(--f1-red);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+}
+
+.complexity-value {
+    font-family: var(--font-primary);
+    font-size: 1.2rem;
+    color: var(--f1-white);
+}
+
+.code-metrics h4, .complexity-factors h4 {
+    color: var(--f1-red);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.metric {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid var(--f1-gray);
+}
+
+.factor {
+    padding: 0.8rem;
+    background: rgba(255, 165, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid #ffa500;
+}
+
+/* Input/Output Analysis */
+.io-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.io-section h4 {
+    color: var(--f1-red);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.io-item {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid var(--f1-red);
+}
+
+.data-flow {
+    text-align: center;
+    font-style: italic;
+    color: var(--f1-gold);
+    padding: 1rem;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Security Analysis */
+.security-item {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 10px;
+    border-left: 4px solid;
+}
+
+.security-safe {
+    background: rgba(0, 255, 0, 0.1);
+    border-left-color: #00ff00;
+}
+
+.security-medium {
+    background: rgba(255, 165, 0, 0.1);
+    border-left-color: #ffa500;
+}
+
+.security-high {
+    background: rgba(255, 0, 0, 0.1);
+    border-left-color: #ff4444;
+}
+
+.security-level {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.security-issue, .security-description, .security-recommendation {
+    margin-bottom: 0.8rem;
+    line-height: 1.5;
+}
+
+/* Pseudocode */
+.pseudocode {
+    background: var(--f1-black);
+    padding: 2rem;
+    border-radius: 10px;
+    border: 1px solid var(--f1-gray);
+    font-family: 'Courier New', monospace;
+}
+
+.pseudo-line {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(51, 51, 51, 0.5);
+    color: var(--f1-silver);
+    line-height: 1.6;
+}
+
+.pseudo-line:first-child {
+    color: var(--f1-red);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.pseudo-line:last-child {
+    color: var(--f1-gold);
+    font-weight: bold;
+    border-bottom: none;
+}
+
+/* Error Modal */
+.error-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(5px);
+}
+
+.error-content {
+    background: var(--f1-black);
+    padding: 3rem;
+    border-radius: 15px;
+    border: 2px solid var(--f1-red);
+    text-align: center;
+    max-width: 500px;
+    box-shadow: 0 20px 60px rgba(220, 20, 60, 0.4);
+}
+
+.error-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.error-content h3 {
+    font-family: var(--font-primary);
+    color: var(--f1-red);
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.error-content p {
+    color: var(--f1-silver);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.error-close {
+    background: var(--racing-gradient);
+    color: var(--f1-white);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 25px;
+    font-family: var(--font-secondary);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--pit-speed);
+}
+
+.error-close:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(220, 20, 60, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .header .container {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .logo h1 {
+        font-size: 1.5rem;
+    }
+    
+    .section-header h2 {
+        font-size: 2rem;
+    }
+    
+    .code-input-wrapper {
+        padding: 1rem;
+    }
+    
+    .input-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .analyze-btn, .clear-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .keywords-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .complexity-grid, .io-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .speedometer {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .speed-value {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo h1 {
+        font-size: 1.2rem;
+    }
+    
+    .section-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .error-content {
+        margin: 1rem;
+        padding: 2rem;
+    }
+    
+    .card-content {
+        padding: 1rem;
+    }
+    
+    .speedometer {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .speed-value {
+        font-size: 1.2rem;
+    }
+    
+    .f1-car {
+        font-size: 2rem;
+    }
+    
+    .loading-text {
+        font-size: 1rem;
+    }
+    
+    .checkered-flag {
+        font-size: 2rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .track-lines, #bg-video, .bg-image {
+        display: none;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .result-card {
+        break-inside: avoid;
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+    }
+    
+    .loading-section {
+        display: none !important;
+    }
+    
+    .input-section {
+        display: none;
+    }
+}
+
+/* Additional F1 Theme Enhancements */
+.code-input-wrapper::after {
+    content: '🏁';
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+    font-size: 1.5rem;
+    opacity: 0.3;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--f1-black);
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--racing-gradient);
+    border-radius: 6px;
+    border: 2px solid var(--f1-black);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--f1-red);
+}
+
+/* Selection Styling */
+::selection {
+    background: rgba(220, 20, 60, 0.3);
+    color: var(--f1-white);
+}
+
+::-moz-selection {
+    background: rgba(220, 20, 60, 0.3);
+    color: var(--f1-white);
+}
+
+/* Focus Indicators */
+button:focus {
+    outline: 2px solid var(--f1-red);
+    outline-offset: 2px;
+}
+
+/* Additional Animations */
+@keyframes engine-rev {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.05) rotate(2deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.analyze-btn:active {
+    animation: engine-rev 0.3s ease-in-out;
+}
+
+/* Gradient Text Effects */
+.gradient-text {
+    background: var(--speed-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Racing Stripes Effect */
+.racing-stripes::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: repeating-linear-gradient(
+        90deg,
+        var(--f1-red) 0px,
+        var(--f1-red) 20px,
+        var(--f1-white) 20px,
+        var(--f1-white) 40px
+    );
+    animation: racing-stripes-move 1s linear infinite;
+}
+
+@keyframes racing-stripes-move {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(40px); }
+}
+
+/* F1 Grid Overlay Effect */
+.f1-grid {
+    position: relative;
+}
+
+.f1-grid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(220, 20, 60, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(220, 20, 60, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+/* Pit Lane Effect */
+.pit-lane {
+    position: relative;
+    overflow: hidden;
+}
+
+.pit-lane::after {
+    content: '🏎️';
+    position: absolute;
+    left: -50px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2rem;
+    animation: pit-lane-drive 8s linear infinite;
+}
+
+@keyframes pit-lane-drive {
+    0% { left: -50px; }
+    100% { left: calc(100% + 50px); }
+}
+
+/* Championship Points Style */
+.championship-points {
+    display: inline-block;
+    background: var(--racing-gradient);
+    color: var(--f1-white);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Podium Effect */
+.podium-finish {
+    position: relative;
+    background: linear-gradient(135deg, var(--f1-gold) 0%, #fff 50%, var(--f1-gold) 100%);
+    color: var(--f1-black);
+    font-weight: bold;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+}
+
+.podium-finish::before {
+    content: '🏆';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    animation: trophy-bounce 2s ease-in-out infinite;
+}
+
+@keyframes trophy-bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-10px); }
+}
+
+/* DRS Zone Effect */
+.drs-zone {
+    position: relative;
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 0, 0.2) 50%, transparent 100%);
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px dashed #00ff00;
+}
+
+.drs-zone::before {
+    content: 'DRS ZONE';
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    background: #00ff00;
+    color: var(--f1-black);
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+/* Safety Car Effect */
+.safety-car {
+    background: linear-gradient(45deg, #ffff00 25%, transparent 25%),
+                linear-gradient(-45deg, #ffff00 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #ffff00 75%),
+                linear-gradient(-45deg, transparent 75%, #ffff00 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    animation: safety-car-flash 1s ease-in-out infinite alternate;
+}
+
+@keyframes safety-car-flash {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
